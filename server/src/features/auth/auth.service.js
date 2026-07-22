@@ -1,5 +1,5 @@
 import prisma from "../../common/lib/prisma.js";
-import { hashPassword } from "./auth.utils.js";
+import { hashPassword, checkPassword } from "./auth.utils.js";
 
 export const signupUser = async ({ username, email, password}) => {
     // check if user already exists
@@ -25,3 +25,24 @@ export const signupUser = async ({ username, email, password}) => {
     const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
 };
+
+export const loginUser = async ({ email, password}) => {
+    const user = await prisma.user.findUnique({
+        where: { email }
+    });
+    if (!user) {
+        const error = new Error("Invalid email or password");
+        error.statusCode = 401;
+        throw error;
+    }
+
+    const passwordMatch = await checkPassword(password, user.password);
+    if (!passwordMatch) {
+        const error = new Error("Invalid email or password");
+        error.statusCode = 401;
+        throw error;
+    }
+
+    const { password: _, ...userWithoutPassword} = user;
+    return userWithoutPassword;
+}

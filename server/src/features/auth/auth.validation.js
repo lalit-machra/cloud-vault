@@ -5,3 +5,8 @@ export const signupSchema = z.object({
     email: z.email("Invalid email").transform(email => email.toLowerCase()),
     password: z.string().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/, "Weak password")
 });
+
+export const loginSchema = z.object({
+    email: z.email("Invalid email").nonempty(),
+    password: z.string().nonempty()
+});

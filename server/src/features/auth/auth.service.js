@@ -32,14 +32,14 @@ export const loginUser = async ({ email, password}) => {
     });
     if (!user) {
         const error = new Error("Invalid email or password");
-        error.statusCode = 401;
+        error.statusCode = 400;
         throw error;
     }
 
     const passwordMatch = await checkPassword(password, user.password);
     if (!passwordMatch) {
         const error = new Error("Invalid email or password");
-        error.statusCode = 401;
+        error.statusCode = 400;
         throw error;
     }
 

@@ -3,9 +3,11 @@ import indexRouter from "./routes/index.routes.js";
 import authRouter from "./features/auth/auth.routes.js";
 import { errorHandler } from "./common/middleware/errorHandler.js";
 import filesRouter from "./features/files/files.routes.js";
+import cors from "cors";
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.use('/', indexRouter);

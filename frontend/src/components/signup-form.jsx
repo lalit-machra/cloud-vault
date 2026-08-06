@@ -71,7 +71,7 @@ export function SignupForm({
               <FieldDescription>Please confirm your password.</FieldDescription>
             </Field>
             <FieldGroup>
-              <Field>
+              <Field className="mt-5">
                 <Button type="submit">Create Account</Button>
                 <FieldDescription className="text-center">
                   Already have an account? <Link to="/login" className="text-blue-600">Login</Link>

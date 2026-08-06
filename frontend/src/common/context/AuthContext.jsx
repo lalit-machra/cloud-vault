@@ -1,7 +1,8 @@
-import { createContext, useContext, useState } from "react";
-import { signupApi, loginApi } from "@/features/auth/authApi";
+import { createContext, useContext, useEffect, useState } from "react";
+import { signupApi, loginApi, getUserApi } from "@/features/auth/authApi";
 
 const AuthContext = createContext({
+    loading: true,
     user: { userId: null, username: null, email: null },
     signup: () => {},
     login: () => {},
@@ -10,6 +11,20 @@ const AuthContext = createContext({
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState({ userId: null, username: null, email: null });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+            
+            const user = await getUserApi();
+            console.log("hello");
+            setUser({ userId: user.id, username: user.username, email: user.email });
+            setLoading(false);
+        }
+        fetchUser();
+    }, []);
 
     const signup = async ({ username, email, password}) => {
         await signupApi({ username, email, password });
@@ -28,7 +43,7 @@ export function AuthProvider({ children }) {
         setUser({ userId: null, username: null, email: null });
     }
 
-    return (<AuthContext.Provider value={{ user, signup, login, logout }}>
+    return (<AuthContext.Provider value={{ loading, user, signup, login, logout }}>
         {children}
     </AuthContext.Provider>);
 }

@@ -26,14 +26,20 @@ export const uploadFile = async ({ userId, originalname, mimetype, size, buffer 
             key,
             size,
             mime: mimetype,
+        },
+        select: {
+            id: true,
+            filename: true,
+            size: true,
+            mime: true,
+            createdAt: true
         }
     });
-    const { key: _, ...safeFile } = file;
 
-    return safeFile;
+    return file;
 }
 
-export const getFile = async ({ fileId, userId }) => {
+export const getFile = async ({ fileId, userId, download }) => {
     // get file's key
     const file = await prisma.file.findUnique({
         where: { id: fileId }
@@ -46,14 +52,17 @@ export const getFile = async ({ fileId, userId }) => {
     // fetch image from aws s3
     const command = new GetObjectCommand({
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: key
+        Key: key,
+        ...(download && {
+            ResponseContentDisposition: `attachment; filename="${file.filename}"`
+        }),
     });
 
     const fileUrl = await getSignedUrl(s3client, command, {
         expiresIn: 3600
     });
 
-    return { fileName: file.filename, fileSize: file.size, fileUrl };
+    return { fileName: file.filename, fileSize: file.size, fileMime: file.mime, fileUrl };
 }
 
 export const listAll = async ({ userId }) => {

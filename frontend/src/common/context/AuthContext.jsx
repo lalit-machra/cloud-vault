@@ -16,10 +16,12 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const fetchUser = async () => {
             const token = localStorage.getItem("token");
-            if (!token) return;
+            if (!token) {
+                setLoading(false);
+                return;
+            }
             
             const user = await getUserApi();
-            console.log("hello");
             setUser({ userId: user.id, username: user.username, email: user.email });
             setLoading(false);
         }
@@ -35,6 +37,7 @@ export function AuthProvider({ children }) {
         const response = await loginApi({ email, password });
         const { user: userInfo, token } = response;
         setUser({ userId: userInfo.id, username: userInfo.username, email: userInfo.email });
+        setLoading(false);
         localStorage.setItem("token", token);
     }
 

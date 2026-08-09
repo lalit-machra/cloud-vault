@@ -19,7 +19,8 @@ export const getFileController = async (req, res, next) => {
     try {
         const { fileId } = req.params;
         const userId = req.user.userId;
-        const file = await getFile({ fileId, userId });
+        const download = req.query.download === "true";
+        const file = await getFile({ fileId, userId, download });
         res.status(200).json(file);
     } catch(err) {
         next(err);

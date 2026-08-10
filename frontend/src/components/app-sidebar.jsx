@@ -15,7 +15,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
 } from "@/components/ui/sidebar"
 import { ChevronRightIcon } from "lucide-react"
 import { Link } from "react-router-dom"
@@ -25,30 +24,16 @@ const data = {
   navMain: [
     {
       title: "Files",
-      url: "#",
+      url: "/",
       items: [
         {
           title: "All Files",
-          url: "#",
+          url: "/",
         },
         {
           title: "Starred Files",
-          url: "#",
+          url: "/",
         }
-      ],
-    },
-    {
-      title: "Folders",
-      url: "#",
-      items: [
-        {
-          title: "Vacation",
-          url: "#",
-        },
-        {
-          title: "Summer Camp",
-          url: "#",
-        },
       ],
     },
   ],
@@ -97,7 +82,6 @@ export function AppSidebar({
           </Collapsible>
         ))}
       </SidebarContent>
-      <SidebarRail />
     </Sidebar>
   );
 }

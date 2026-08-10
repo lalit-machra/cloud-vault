@@ -27,33 +27,26 @@ import {
 } from "lucide-react"
 
 import { formatDate, formatSize } from "@/common/utils/format.js";
-import { getFile, listFiles, deleteFile } from "./filesApi.js";
+import { getFile, deleteFile } from "./filesApi.js";
 import { useEffect, useState, useRef } from "react";
+import { getFileIcon } from "./filesUtils.js";
 
-export function DisplayFiles({ allFiles, updateFilesList, updateFilesUponDeletion }) {
+export function DisplayFiles({ allFiles, updateFilesUponDeletion }) {
   const [ selected, setSelected ] = useState(null);
   const [ loadingFileId, setLoadingFileId ] = useState(null);
   const containerRef = useRef(null);
 
   useEffect(() => {
-      const fetchFiles = async() => {
-        const files = await listFiles();
-        updateFilesList(files);
-      }
-      fetchFiles();
-  }, []);
-
-  useEffect(() => {
-    const hanldeClickOutside = (event) => {
+    const handleClickOutside = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
         setSelected(null);  
       }
     }
 
-    document.addEventListener("mousedown", hanldeClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-        document.removeEventListener("mousedown", hanldeClickOutside);
+        document.removeEventListener("mousedown", handleClickOutside);
     }
   }, []);
 
@@ -96,47 +89,50 @@ export function DisplayFiles({ allFiles, updateFilesList, updateFilesUponDeletio
   }
 
   return (
-      <>
-          <Table ref={containerRef}>
-            <TableHeader>
-              <TableRow className="hover:bg-cyan-500/0">
-                <TableHead className="w-1/2">File</TableHead>
-                <TableHead>Date Created</TableHead>
-                <TableHead>Size</TableHead>
-                <TableHead className="text-right">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {allFiles.map((file) => {
-                return (<TableRow key={file.id} className={cn("group", file.id === selected ? "bg-cyan-500/20" : "hover:bg-cyan-500/5", file.id === loadingFileId && "pointer-events-none opacity-30 bg-cyan-500/0 hover:bg-cyan-500/0")} onClick={() => handleClick(file.id)} onDoubleClick={() => handleDoubleClick(file.id)}>
-                  <TableCell>{file.filename}</TableCell>
-                  <TableCell>{formatDate(file.createdAt)}</TableCell>
-                  <TableCell>{formatSize(file.size)}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger render={<Button variant="outline" size="icon" aria-label="More Options" onClick={(e) => e.stopPropagation()} className={cn("opacity-0", file.id === selected ? "opacity-100" : "group-hover:opacity-100")}><MoreVerticalIcon /></Button>} />
-                      <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuGroup>
-                          <DropdownMenuItem onClick={() => handlePreviewClick(file.id)}>
-                            <Eye></Eye>
-                            Preview
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDownloadClick(file.id)}>
-                            <Download></Download>
-                            Download
-                          </DropdownMenuItem>
-                          <DropdownMenuItem variant="destructive" onClick={() => handleDeleteClick(file.id)}>
-                            <Trash2Icon />
-                              Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>  
-                  </TableCell>  
-                </TableRow>);
-              })}
-            </TableBody>
-          </Table>
-      </>
+    <Table ref={containerRef}>
+      <TableHeader>
+        <TableRow className="hover:bg-cyan-500/0">
+          <TableHead className="w-1/2">File</TableHead>
+          <TableHead>Date Created</TableHead>
+          <TableHead>Size</TableHead>
+          <TableHead className="text-right">Action</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {allFiles.map((file) => {
+          return (<TableRow key={file.id} className={cn("group", file.id === selected ? "bg-cyan-500/40" : "hover:bg-cyan-500/15", file.id === loadingFileId && "pointer-events-none opacity-30 bg-cyan-500/0 hover:bg-cyan-500/0")} onClick={() => handleClick(file.id)} onDoubleClick={() => handleDoubleClick(file.id)}>
+            <TableCell>
+              <div className="flex flex-row justify-start items-center h-full gap-2">
+                <img src={getFileIcon(file.mime)} className="h-6 w-6 shrink-0" alt="" />
+                <span>{file.filename}</span>
+              </div>
+            </TableCell>
+            <TableCell>{formatDate(file.createdAt)}</TableCell>
+            <TableCell>{formatSize(file.size)}</TableCell>
+            <TableCell className="text-right">
+              <DropdownMenu>
+                <DropdownMenuTrigger render={<Button variant="outline" size="icon" aria-label="More Options" onClick={(e) => e.stopPropagation()} className={cn("opacity-0", file.id === selected ? "opacity-100" : "group-hover:opacity-100")}><MoreVerticalIcon /></Button>} />
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem onClick={() => handlePreviewClick(file.id)}>
+                      <Eye></Eye>
+                      Preview
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDownloadClick(file.id)}>
+                      <Download></Download>
+                      Download
+                    </DropdownMenuItem>
+                    <DropdownMenuItem variant="destructive" onClick={() => handleDeleteClick(file.id)}>
+                      <Trash2Icon />
+                        Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>  
+            </TableCell>  
+          </TableRow>);
+        })}
+      </TableBody>
+    </Table>
   );
 }

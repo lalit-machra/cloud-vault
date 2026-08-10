@@ -39,10 +39,10 @@ function SpinnerButton({text}) {
 
 function UploadSpinner() {
   return (
-    <div className="h-36 w-full rounded-xl bg-muted/50 flex items-center justify-center">
+    <div className="h-23 w-full rounded-xl border border-muted-50/100 bg-muted flex items-center justify-center">
       <div className="flex flex-col items-center gap-2">
-        <Spinner />
-        <p>Uploading...</p>
+        <Spinner className="size-6"/>
+        <p className="text-sm">Uploading...</p>
       </div>
     </div>
   );

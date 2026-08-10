@@ -1,5 +1,6 @@
 import { fileUpload } from "./filesApi";
 import { toast } from "@/components/ui/toast"
+import { Upload } from "lucide-react";
 
 export function UploadFile({ uploadingStatus, appendFiles }) {
     const handleChange = async (e) => {
@@ -27,9 +28,9 @@ export function UploadFile({ uploadingStatus, appendFiles }) {
         <>
             <input type="file" id="file" onChange={handleChange} hidden></input>
             <label htmlFor="file" className="w-full">
-                <div className="h-36 rounded-xl bg-muted/50 flex justify-center items-center flex-col w-full hover:bg-cyan-500/20 active:bg-cyan-500/30">
-                    <img src="../public/cloud-upload.svg" className="h-14 w-14"></img>
-                    <p>Upload</p>
+                <div className="h-23 rounded-xl bg-cyan-500 flex justify-center items-center flex-col w-full hover:bg-cyan-600 active:bg-cyan-700">
+                    <Upload className="h-7 w-18 text-white" />
+                    <p className="text-white">Upload</p>
                 </div>
             </label>
         </>

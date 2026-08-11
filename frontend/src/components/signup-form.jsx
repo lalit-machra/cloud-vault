@@ -33,7 +33,7 @@ export function SignupForm({
     setError(null);
     try {
       await signup({username, email, password});
-      navigate("/");
+      navigate("/dashboard");
     } catch(err) {
       setError(err.response?.data?.message || "Something went wrong");
     }

@@ -1,12 +1,13 @@
 import { Login } from "./features/auth/Login";
 import { Signup } from "./features/auth/Signup";
 import { Protected } from "./features/protected/protected";
-import App from "./App.jsx";
+import { LandingPage } from "./features/landingPage/LandingPage";
+import App from "./features/dashboard/App.jsx";
 
 export const routes = [
     {
         path: "/",
-        element: <Protected><App></App></Protected>,
+        element: <LandingPage></LandingPage>
     },
     {
         path: "/login",
@@ -15,5 +16,9 @@ export const routes = [
     {
         path: "/signup",
         element: <Signup></Signup>,
-    }
+    },
+    {
+        path: "/dashboard",
+        element: <Protected><App></App></Protected>,
+    },
 ]

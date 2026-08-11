@@ -8,7 +8,7 @@ export function Protected({ children }) {
         return <div className="h-screen w-screen flex justify-center items-center"><SpinnerButton text="Loading"></SpinnerButton></div>
     } else {
         if (!user.userId) {
-            return <Navigate to="/login"></Navigate>
+            return <Navigate to="/"></Navigate>
         }
         return (
             <>

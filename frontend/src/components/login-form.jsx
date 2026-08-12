@@ -41,11 +41,13 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      {error && <span className="text-red-500 text-sm">{error}</span>}
       <Card>
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
         </CardHeader>
+        <div className="h-5 my-4 mx-5">
+          {error && <span className="text-red-500 text-sm ml-5">{error}</span>}
+        </div>
         <CardContent>
           <form onSubmit={handleSubmit}>
             <FieldGroup>
@@ -60,9 +62,9 @@ export function LoginForm({
                 <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </Field>
               <Field className="mt-5">
-                <Button type="submit">Login</Button>
-                <FieldDescription className="text-center">
-                  Don&apos;t have an account? <Link to="/signup" className="text-blue-600">Sign Up</Link>
+                <Button type="submit" className="mb-2">Login</Button>
+                <FieldDescription className="text-center my-5">
+                  Don&apos;t have an account? <Link to="/signup" className="text-cyan-500">Sign Up</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

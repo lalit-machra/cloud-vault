@@ -41,10 +41,12 @@ export function SignupForm({
 
   return (
     <Card {...props}>
-      {error && <span className="text-red-500 text-sm ml-5">{error}</span>}
       <CardHeader>
         <CardTitle>Create an account</CardTitle>
       </CardHeader>
+      <div className="h-5 my-4 mx-5">
+        {error && <span className="text-red-500 text-sm ml-5">{error}</span>}
+      </div>
       <CardContent>
         <form onSubmit={handleSubmit}>
           <FieldGroup>
@@ -59,22 +61,12 @@ export function SignupForm({
             <Field>
               <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-              <FieldDescription>
-                Must be at least 8 characters long.
-              </FieldDescription>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="confirm-password">
-                Confirm Password
-              </FieldLabel>
-              <Input id="confirm-password" type="password" required />
-              <FieldDescription>Please confirm your password.</FieldDescription>
             </Field>
             <FieldGroup>
               <Field className="mt-5">
-                <Button type="submit">Create Account</Button>
-                <FieldDescription className="text-center">
-                  Already have an account? <Link to="/login" className="text-blue-600">Login</Link>
+                <Button type="submit" className="mb-2">Create Account</Button>
+                <FieldDescription className="text-center my-5">
+                  Already have an account? <Link to="/login" className="text-cyan-500">Login</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

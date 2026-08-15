@@ -81,7 +81,7 @@ export default function App() {
           <div className=" w-full h-full flex justify-between items-center m-5">
             <h1 className="text-3xl">Welcome <span className="text-cyan-500">{user.username}</span></h1>
             <DropdownMenu>
-              <DropdownMenuTrigger nativeButton={false} render={<img src="../public/account.svg" className="h-10 w-10 hover:bg-cyan-500/15"></img>} />
+              <DropdownMenuTrigger nativeButton={false} render={<img src="/account.svg" className="h-10 w-10 hover:bg-cyan-500/15"></img>} />
               <DropdownMenuContent>
                 <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
               </DropdownMenuContent>

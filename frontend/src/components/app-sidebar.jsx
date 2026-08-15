@@ -46,7 +46,7 @@ export function AppSidebar({
     <Sidebar {...props}>
       <SidebarHeader className="m-3">
         <Link to="/">
-          <img src="../../../public/logo.png" className="p-2"></img>
+          <img src="/logo.png" className="p-2"></img>
         </Link>
       </SidebarHeader>
       <SidebarContent className="gap-3">

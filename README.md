@@ -1,5 +1,9 @@
 # CloudVault
 
+> A lightweight personal cloud storage platform built with React, Node.js, Express, PostgreSQL, and AWS.
+
+**[🚀 Live Demo](https://cloud-vault-livid.vercel.app/)**
+
 CloudVault is a personal cloud storage platform — a lightweight alternative to something like Google Drive. Users sign up, land on a dashboard, and upload files that are securely stored and tied to their account alone. From there they can browse, search, sort, preview, download, and delete their files through a single clean interface, accessible from any device.
 
 ## Features

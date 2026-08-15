@@ -27,24 +27,24 @@ export function sortFiles({ allFiles, option }) {
 export function getFileIcon(mimetype) {
     switch (mimetype) {
         case "image/jpeg":
-            return "/public/jpg-image-file-icon.svg";
+            return "/jpg-image-file-icon.svg";
         case "image/png":
-            return "/public/png-image-file-icon.svg";
+            return "/png-image-file-icon.svg";
         case "application/pdf":
-            return "/public/red-pdf-icon.svg";
+            return "/red-pdf-icon.svg";
         case "text/plain":
-            return "/public/txt-file-icon.svg";
+            return "/txt-file-icon.svg";
         case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            return "/public/blue-docx-icon.svg";
+            return "/blue-docx-icon.svg";
         case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-            return "/public/green-xls-excel-file-icon.svg";
+            return "/green-xls-excel-file-icon.svg";
         case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-            return "/public/powerpoint-icon.svg";
+            return "/powerpoint-icon.svg";
         case "image/svg+xml":
-            return "/public/red-svg-file-icon.svg";
+            return "/red-svg-file-icon.svg";
         case "video/mp4":
-            return "/public/red-video-file-icon.svg";
+            return "/red-video-file-icon.svg";
         default:
-            return "/public/general-file.svg";
+            return "/general-file.svg";
     }
 }

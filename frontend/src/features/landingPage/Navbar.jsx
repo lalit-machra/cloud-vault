@@ -5,7 +5,7 @@ export function Navbar() {
     return (
         <div className="sticky top-0 flex flex-row justify-between items-center py-6 bg-[oklch(0.97_0_0)]">
             <div className="h-full pl-5">
-                <img className="h-12" src="../../../public/logo.png"></img>
+                <img className="h-12" src="/logo.png"></img>
             </div>
             <div className="h-full pr-6 flex flex-row justify-between items-center gap-10">
                 <button onClick={() => navigate("/login")} className="w-20 h-12 p-2 bg-cyan-500 text-white rounded-md hover:bg-cyan-600">Login</button>

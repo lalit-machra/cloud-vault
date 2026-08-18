@@ -4,6 +4,8 @@ import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sd
 import { randomUUID } from "crypto";
 import prisma from "../../common/lib/prisma.js";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { Readable } from "stream";
+import ai from "../../common/lib/gemini.js";
 
 export const uploadFile = async ({ userId, originalname, mimetype, size, buffer }) => {
     // upload file to aws s3
@@ -63,6 +65,102 @@ export const getFile = async ({ fileId, userId, download }) => {
     });
 
     return { fileName: file.filename, fileSize: file.size, fileMime: file.mime, fileUrl };
+}
+
+const getFileReadable = async ({ key }) => {
+    const command = new GetObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: key,
+    });
+
+    const response = await s3client.send(command);
+
+    return Readable.from(response.Body);
+}
+
+// File category is generated upon upload
+export const getFileCategory = async ({ fileId, userId }) => {
+    // look up file in database
+    const file = await prisma.file.findUnique({
+        where: { id: fileId },
+    });
+    if (!file) throw new Error("File not found");
+
+    if (file.userId !== userId) throw new Error("File not found");
+
+    // Upload file to Gemini Files API
+    const readable = await getFileReadable({ key: file.key });
+    const fileRef = await ai.files.upload({
+        file: readable,
+        mimeType: file.mime,
+    });
+
+    // Use Interactions API to get category
+    const interaction = await ai.interactions.create({
+        model: "gemini-3.6-flash",
+        input: [
+            fileRef,
+            {text: "Categorize this document into one of following categories - personal, work, others"}
+        ]
+    });
+
+    const category = interaction.output_text;
+
+    // Update category, file uri, and file upload time in database
+    const geminiFileUri = fileRef.name;
+    const geminiUploadedAt = new Date();
+    await prisma.file.update({
+        where: { id: fileId },
+        data: { category, geminiFileUri, geminiUploadedAt },
+    });
+
+    return { category };
+}
+
+export const getFileSummary = async ({ fileId, userId }) => {
+    // look up file in database
+    const file = await prisma.file.findUnique({
+        where: { id: fileId },
+    });
+    if (!file) throw new Error("File not found");
+
+    if (file.userId !== userId) throw new Error("File not found");
+
+    if (file.summary) return { summary: file.summary };
+
+    // Access the file
+    let fileRef;
+    const isStillValid = (Date.now() - new Date(file.geminiUploadedAt).getTime()) < (48 * 60 * 60 * 1000);
+    if (file.geminiFileUri && isStillValid) {
+        // If file was uploaded less than 48 hours ago, no need to upload file again
+        fileRef = await ai.files.get({ name: file.geminiFileUri });
+    } else {
+        // Upload file again to Gemini Files API
+        const readable = await getFileReadable({ key: file.key });
+        fileRef = await ai.files.upload({
+            file: readable,
+            mimeType: file.mime,
+        });
+    }
+    
+    // Use Interactions API to get summary
+    const interaction = await ai.interactions.create({
+        model: "gemini-3.6-flash",
+        input: [
+            fileRef,
+            { text: "Provide a short and precise summary for this document." }
+        ]
+    });
+
+    const summary = interaction.output_text;
+
+    // Update summary in database
+    await prisma.file.update({
+        where: { id: fileId },
+        data: { summary }
+    });
+
+    return { summary };
 }
 
 export const listAll = async ({ userId }) => {

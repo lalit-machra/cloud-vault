@@ -1,4 +1,5 @@
-import { deleteFile, listAll, uploadFile, getFile } from "./files.service.js";
+import { deleteFile, listAll, uploadFile, getFile, getFileSummary, getFileCategory } from "./files.service.js";
+
 
 export const uploadFileController = async (req, res, next) => {
     try {
@@ -22,6 +23,28 @@ export const getFileController = async (req, res, next) => {
         const download = req.query.download === "true";
         const file = await getFile({ fileId, userId, download });
         res.status(200).json(file);
+    } catch(err) {
+        next(err);
+    }
+}
+
+export const getFileCategoryController = async (req, res, next) => {
+    try {
+        const { fileId } = req.params;
+        const userId = req.user.userId;
+        const category = await getFileCategory({ fileId, userId });
+        res.status(200).json({ category });
+    } catch(err) {
+        next(err);
+    }
+}
+
+export const getFileSummaryController = async (req, res, next) => {
+    try {
+        const { fileId } = req.params;
+        const userId = req.user.userId;
+        const summary = await getFileSummary({ fileId, userId });
+        res.status(200).json({ summary });
     } catch(err) {
         next(err);
     }

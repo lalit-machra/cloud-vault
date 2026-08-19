@@ -33,10 +33,16 @@ export const uploadFile = async ({ userId, originalname, mimetype, size, buffer 
             id: true,
             filename: true,
             size: true,
+            category: true,
+            summary: true,
             mime: true,
             createdAt: true
         }
     });
+
+    getFileCategory({ fileId: file.id, userId }).catch((err) => {
+        console.error(`Categorization failed for ${file.filename}: `, err);
+    })
 
     return file;
 }
@@ -79,7 +85,7 @@ const getFileReadable = async ({ key }) => {
 }
 
 // File category is generated upon upload
-export const getFileCategory = async ({ fileId, userId }) => {
+const getFileCategory = async ({ fileId, userId }) => {
     // look up file in database
     const file = await prisma.file.findUnique({
         where: { id: fileId },
@@ -115,6 +121,19 @@ export const getFileCategory = async ({ fileId, userId }) => {
     });
 
     return { category };
+}
+
+// fetch the category for polling on frontend
+export const fetchFileCategoryStatus = async ({ fileId, userId }) => {
+    const file = await prisma.file.findUnique({
+        where: { id: fileId },
+        select: { userId: true, category: true }
+    });
+    if (!file) throw new Error("File not found");
+
+    if (file.userId !== userId) throw new Error("File not found");
+
+    return { category: file.category };
 }
 
 export const getFileSummary = async ({ fileId, userId }) => {
@@ -170,6 +189,8 @@ export const listAll = async ({ userId }) => {
             id: true,
             filename: true,
             size: true,
+            category: true,
+            summary: true,
             mime: true,
             createdAt: true
         }

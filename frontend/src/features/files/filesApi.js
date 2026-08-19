@@ -23,3 +23,31 @@ export const deleteFile = async (fileId) => {
     const response = await apiClient.delete(`/files/${fileId}`);
     return response;
 }
+
+export const pollForCategory = async ({fileId, updateFileUponCategory, maxAttempts=6, intervalMs=3000}) =>  {
+    for (let i = 0; i < maxAttempts; i++) {
+        await new Promise((resolve) => setTimeout(resolve, intervalMs));
+        try {
+            const { category }  = await apiClient.get(`/files/?fileId=${fileId}/category`);
+            if (category) {
+                updateFileUponCategory(fileId, category);
+                return;
+            }
+        } catch(err) {
+            console.error("Polling failed: ", err);
+            return;
+        }
+    }
+    
+    return null;
+}
+
+export const getSummary = async ({ fileId }) => {
+    try {
+        const { summary } = await apiClient.get(`/files/summary?fileId=${fileId}`);
+        return summary;
+    } catch(err) {
+        console.error("Couldn't fetch summary: ", err);
+        return null;
+    }
+}

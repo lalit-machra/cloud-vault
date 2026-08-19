@@ -58,6 +58,14 @@ export default function App() {
     setAllFiles((prev) => prev.filter((file) => file.id != deleteFileId));
   }
 
+  const updateFileUponCategory = (fileId, category) => {
+    setAllFiles((prev) => prev.map((file) => file.id === fileId ? {...file, category} : file));
+  }
+
+  const updateFileUponSummary = (fileId, summary) => {
+    setAllFiles((prev) => prev.map((file) => file.id === fileId ? { ...file, summary } : file));
+  }
+
   const onChangeSearch = (e) => {
     setSearch(e.target.value);
   } 
@@ -91,7 +99,7 @@ export default function App() {
         <div className="flex flex-1 flex-col gap-4 p-6">
           <div className="grid gap-4 md:grid-cols-[2fr_5fr] py-2">
             <div className="grid gap-16 rounded-xl grid-cols-2 px-5">
-              {uploading ? <UploadSpinner></UploadSpinner> : <UploadFile uploadingStatus={uploadingStatus} appendFiles={appendFiles}></UploadFile>}
+              {uploading ? <UploadSpinner></UploadSpinner> : <UploadFile uploadingStatus={uploadingStatus} appendFiles={appendFiles} updateFileUponCategory={updateFileUponCategory}></UploadFile>}
               <DropdownMenu>
                 <DropdownMenuTrigger nativeButton={false} render={
                   <div className="h-23 rounded-xl border border-cyan-500 flex justify-center items-center flex-col w-full hover:bg-cyan-100/20 active:bg-cyan-500/30">
@@ -123,7 +131,7 @@ export default function App() {
             </div>
           </div>
           <div className="min-h-[100vh] flex-1 rounded-xl md:min-h-min px-3 py-2">
-            <DisplayFiles allFiles={filteredFiles} updateFilesList={updateFilesList} updateFilesUponDeletion={updateFilesUponDeletion}></DisplayFiles>
+            <DisplayFiles allFiles={filteredFiles} updateFilesList={updateFilesList} updateFilesUponDeletion={updateFilesUponDeletion} updateFileUponSummary={updateFileUponSummary}></DisplayFiles>
           </div>
         </div>
       </SidebarInset>

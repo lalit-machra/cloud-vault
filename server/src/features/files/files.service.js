@@ -4,8 +4,18 @@ import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sd
 import { randomUUID } from "crypto";
 import prisma from "../../common/lib/prisma.js";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { Readable } from "stream";
-import ai from "../../common/lib/gemini.js";
+import ai from "../../common/lib/openai.js";
+
+// Don't call responses API for these file types
+const AUTO_CATEGORY_TYPES = {
+    "video/mp4": "Media",
+    "audio/mpeg": "Media",
+};
+
+const SUMMARY_UNSUPPORTED_TYPES = new Set([
+    "video/mp4",
+    "audio/mpeg",
+]);
 
 export const uploadFile = async ({ userId, originalname, mimetype, size, buffer }) => {
     // upload file to aws s3
@@ -40,9 +50,17 @@ export const uploadFile = async ({ userId, originalname, mimetype, size, buffer 
         }
     });
 
-    getFileCategory({ fileId: file.id, userId }).catch((err) => {
-        console.error(`Categorization failed for ${file.filename}: `, err);
-    })
+    // If file belongs to any of following types, don't send it over for categorization
+    if (AUTO_CATEGORY_TYPES[mimetype]) {
+        await prisma.file.update({
+            where: { id: file.id },
+            data: { category: AUTO_CATEGORY_TYPES[mimetype] },
+        });
+    } else {
+        getFileCategory({ fileId: file.id, userId }).catch((err) => {
+            console.error(`Categorization failed for ${file.filename}: `, err);
+        });
+    }
 
     return file;
 }
@@ -73,19 +91,8 @@ export const getFile = async ({ fileId, userId, download }) => {
     return { fileName: file.filename, fileSize: file.size, fileMime: file.mime, fileUrl };
 }
 
-const getFileReadable = async ({ key }) => {
-    const command = new GetObjectCommand({
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: key,
-    });
-
-    const response = await s3client.send(command);
-
-    return Readable.from(response.Body);
-}
-
 // File category is generated upon upload
-const getFileCategory = async ({ fileId, userId }) => {
+export const getFileCategory = async ({ fileId, userId }) => {
     // look up file in database
     const file = await prisma.file.findUnique({
         where: { id: fileId },
@@ -94,30 +101,43 @@ const getFileCategory = async ({ fileId, userId }) => {
 
     if (file.userId !== userId) throw new Error("File not found");
 
-    // Upload file to Gemini Files API
-    const readable = await getFileReadable({ key: file.key });
-    const fileRef = await ai.files.upload({
-        file: readable,
-        mimeType: file.mime,
-    });
+    if (file.category) return { category: file.category };
 
-    // Use Interactions API to get category
-    const interaction = await ai.interactions.create({
-        model: "gemini-3.6-flash",
+    const { fileUrl } = await getFile({ fileId, userId, download: false });
+
+    // Use Responses API to get category
+    const fileInput = file.mime.startsWith("image/")
+        ? {
+            type: "input_image",
+            image_url: fileUrl,
+        }
+        : {
+            type: "input_file",
+            file_url: fileUrl,
+        };
+
+    const response = await ai.responses.create({
+        model: "gpt-5.6-luna",
         input: [
-            fileRef,
-            {text: "Categorize this document into one of following categories - personal, work, others"}
-        ]
+            {
+              role: "user",
+              content: [
+                {
+                  type: "input_text",
+                  text: "Categorize this document strictly into one of following categories - Personal, Work, Education, Finance, Media and Others. Return only the category name it belongs to."
+                },
+                fileInput,
+              ],
+            },
+        ],
     });
 
-    const category = interaction.output_text;
+    const category = response.output_text;
 
-    // Update category, file uri, and file upload time in database
-    const geminiFileUri = fileRef.name;
-    const geminiUploadedAt = new Date();
+    // Update category in database
     await prisma.file.update({
         where: { id: fileId },
-        data: { category, geminiFileUri, geminiUploadedAt },
+        data: { category },
     });
 
     return { category };
@@ -145,33 +165,51 @@ export const getFileSummary = async ({ fileId, userId }) => {
 
     if (file.userId !== userId) throw new Error("File not found");
 
+    // Check if summary already exists
     if (file.summary) return { summary: file.summary };
 
-    // Access the file
-    let fileRef;
-    const isStillValid = (Date.now() - new Date(file.geminiUploadedAt).getTime()) < (48 * 60 * 60 * 1000);
-    if (file.geminiFileUri && isStillValid) {
-        // If file was uploaded less than 48 hours ago, no need to upload file again
-        fileRef = await ai.files.get({ name: file.geminiFileUri });
-    } else {
-        // Upload file again to Gemini Files API
-        const readable = await getFileReadable({ key: file.key });
-        fileRef = await ai.files.upload({
-            file: readable,
-            mimeType: file.mime,
-        });
-    }
-    
-    // Use Interactions API to get summary
-    const interaction = await ai.interactions.create({
-        model: "gemini-3.6-flash",
-        input: [
-            fileRef,
-            { text: "Provide a short and precise summary for this document." }
-        ]
-    });
+    // Don't generate summary for unsupported file types
+    if (SUMMARY_UNSUPPORTED_TYPES.has(file.mime)) {
+        const summary = "AI Summary is not supported for this file type.";
 
-    const summary = interaction.output_text;
+        await prisma.file.update({
+            where: { id: fileId },
+            data: { summary }
+        });
+    
+        return { summary };
+    }
+
+    // Use Responses API to get summary
+    const { fileUrl } = await getFile({ fileId, userId, download: false });
+
+    const fileInput = file.mime.startsWith("image/")
+        ? {
+            type: "input_image",
+            image_url: fileUrl,
+        }
+        : {
+            type: "input_file",
+            file_url: fileUrl,
+        };
+
+    const response = await ai.responses.create({
+        model: "gpt-5.6-luna",
+        input: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "input_text",
+                  text: "Summarize this file 40-60 words. Focus on the main purpose, key information, important details, and overall takeaway. Do not add or assume information that is not present in the file. Return plain text only; do not use any Markdown or special formatting."
+                },
+                fileInput,
+              ],
+            },
+        ],
+    });
+    
+    const summary = response.output_text;
 
     // Update summary in database
     await prisma.file.update({

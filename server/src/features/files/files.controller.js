@@ -1,4 +1,5 @@
-import { deleteFile, listAll, uploadFile, getFile, getFileSummary, fetchFileCategoryStatus } from "./files.service.js";
+import { get } from "http";
+import { deleteFile, listAll, uploadFile, getFile, getFileSummary, fetchFileCategoryStatus, getFileCategory } from "./files.service.js";
 
 
 export const uploadFileController = async (req, res, next) => {
@@ -33,7 +34,7 @@ export const fetchFileCategoryController = async (req, res, next) => {
         const { fileId } = req.params;
         const userId = req.user.userId;
         const category = await fetchFileCategoryStatus({ fileId, userId });
-        res.status(200).json({ category });
+        res.status(200).json(category);
     } catch(err) {
         next(err);
     }
@@ -44,7 +45,7 @@ export const getFileSummaryController = async (req, res, next) => {
         const { fileId } = req.params;
         const userId = req.user.userId;
         const summary = await getFileSummary({ fileId, userId });
-        res.status(200).json({ summary });
+        res.status(200).json(summary);
     } catch(err) {
         next(err);
     }

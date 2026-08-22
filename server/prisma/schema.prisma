@@ -32,8 +32,6 @@ model File {
   mime              String
   summary           String?
   category          String?
-  geminiFileUri     String?     @unique
-  geminiUploadedAt  DateTime?
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
   @@index([userId])

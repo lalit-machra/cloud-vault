@@ -21,9 +21,12 @@ export function AuthProvider({ children }) {
                 return;
             }
             
-            const user = await getUserApi();
-            setUser({ userId: user.id, username: user.username, email: user.email });
-            setLoading(false);
+            try {
+                const user = await getUserApi();
+                setUser({ userId: user.id, username: user.username, email: user.email });
+            } finally {
+                setLoading(false);
+            }
         }
         fetchUser();
     }, []);
@@ -34,11 +37,14 @@ export function AuthProvider({ children }) {
     }
 
     const login = async ({ email, password }) => {
-        const response = await loginApi({ email, password });
-        const { user: userInfo, token } = response;
-        setUser({ userId: userInfo.id, username: userInfo.username, email: userInfo.email });
-        setLoading(false);
-        localStorage.setItem("token", token);
+        try {
+            const response = await loginApi({ email, password });
+            const { user: userInfo, token } = response;
+            setUser({ userId: userInfo.id, username: userInfo.username, email: userInfo.email });
+            localStorage.setItem("token", token);
+        } finally {
+            setLoading(false);
+        }
     }
 
     const logout = async () => {

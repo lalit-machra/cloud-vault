@@ -28,7 +28,8 @@ export const pollForCategory = async ({fileId, updateFileUponCategory, maxAttemp
     for (let i = 0; i < maxAttempts; i++) {
         await new Promise((resolve) => setTimeout(resolve, intervalMs));
         try {
-            const { category }  = await apiClient.get(`/files/?fileId=${fileId}/category`);
+            const { data }  = await apiClient.get(`/files/${fileId}/category`);
+            const { category } = data;
             if (category) {
                 updateFileUponCategory(fileId, category);
                 return;
@@ -44,7 +45,10 @@ export const pollForCategory = async ({fileId, updateFileUponCategory, maxAttemp
 
 export const getSummary = async ({ fileId }) => {
     try {
-        const { summary } = await apiClient.get(`/files/summary?fileId=${fileId}`);
+        const { data } = await apiClient.get(`/files/${fileId}/summary`, {
+            timeout: 30000
+        });
+        const { summary } = data;
         return summary;
     } catch(err) {
         console.error("Couldn't fetch summary: ", err);

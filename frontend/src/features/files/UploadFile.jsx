@@ -32,7 +32,7 @@ export function UploadFile({ uploadingStatus, appendFiles, updateFileUponCategor
                 <div className="h-23 rounded-xl bg-cyan-500 flex justify-center items-center flex-col w-full hover:bg-cyan-600 active:bg-cyan-700">
                     <Upload className="h-7 w-18 text-white" />
                     <p className="text-white">Upload</p>
-                </div>buffer
+                </div>
             </label>
         </>
     );

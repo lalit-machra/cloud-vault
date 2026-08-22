@@ -24,20 +24,25 @@ export const deleteFile = async (fileId) => {
     return response;
 }
 
-export const pollForCategory = async ({fileId, updateFileUponCategory, maxAttempts=6, intervalMs=3000}) =>  {
-    for (let i = 0; i < maxAttempts; i++) {
-        await new Promise((resolve) => setTimeout(resolve, intervalMs));
-        try {
-            const { data }  = await apiClient.get(`/files/${fileId}/category`);
-            const { category } = data;
-            if (category) {
-                updateFileUponCategory(fileId, category);
+export const pollForCategory = async ({fileId, updateFileUponCategory, updatePollingFileId, maxAttempts=6, intervalMs=3000}) =>  {
+    updatePollingFileId(fileId, true);
+    try {
+        for (let i = 0; i < maxAttempts; i++) {
+            await new Promise((resolve) => setTimeout(resolve, intervalMs));
+            try {
+                const { data }  = await apiClient.get(`/files/${fileId}/category`);
+                const { category } = data;
+                if (category) {
+                    updateFileUponCategory(fileId, category);
+                    return;
+                }
+            } catch(err) {
+                console.error("Polling failed: ", err);
                 return;
             }
-        } catch(err) {
-            console.error("Polling failed: ", err);
-            return;
         }
+    } finally {
+        updatePollingFileId(fileId, false);
     }
     
     return null;

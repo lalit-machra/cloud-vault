@@ -14,7 +14,7 @@ const features = [
         featurePageNumber: "2",
         featureTitle: "Let AI Make Your Files Smarter",
         featureDescription: "Get quick, useful summaries of lengthy documents and automatically categorize files based on their content, making it easier to find what matters and keep your digital workspace organized.",
-        featureImg: "/coming-soon-cloud-vault.png",
+        featureImg: "/ai-features-demo.mp4",
     },
 ]
 

@@ -41,6 +41,7 @@ export default function App() {
   const [ allFiles, setAllFiles ] = useState([]);
   const [ search, setSearch ] = useState("");
   const [ sort, setSort ] = useState("");
+  const [ pollingFileIds, setPollingFileIds] = useState(new Set());
 
   const uploadingStatus = (value) => {
     setUploading(value);
@@ -69,6 +70,15 @@ export default function App() {
   const onChangeSearch = (e) => {
     setSearch(e.target.value);
   } 
+
+  const updatePollingFileId = (fileId, isPolling) => {
+    setPollingFileIds((prev) => {
+      const next = new Set(prev);
+      if (isPolling) next.add(fileId);
+      else next.delete(fileId); 
+      return next;
+    });
+  }
 
   useEffect(() => {
     const fetchFiles = async() => {
@@ -99,7 +109,7 @@ export default function App() {
         <div className="flex flex-1 flex-col gap-4 p-6">
           <div className="grid gap-4 md:grid-cols-[2fr_5fr] py-2">
             <div className="grid gap-16 rounded-xl grid-cols-2 px-5">
-              {uploading ? <UploadSpinner></UploadSpinner> : <UploadFile uploadingStatus={uploadingStatus} appendFiles={appendFiles} updateFileUponCategory={updateFileUponCategory}></UploadFile>}
+              {uploading ? <UploadSpinner></UploadSpinner> : <UploadFile uploadingStatus={uploadingStatus} appendFiles={appendFiles} updateFileUponCategory={updateFileUponCategory} updatePollingFileId={updatePollingFileId}></UploadFile>}
               <DropdownMenu>
                 <DropdownMenuTrigger nativeButton={false} render={
                   <div className="h-23 rounded-xl border border-cyan-500 flex justify-center items-center flex-col w-full hover:bg-cyan-100/20 active:bg-cyan-500/30">
@@ -131,7 +141,7 @@ export default function App() {
             </div>
           </div>
           <div className="min-h-[100vh] flex-1 rounded-xl md:min-h-min px-3 py-2">
-            <DisplayFiles allFiles={filteredFiles} updateFilesList={updateFilesList} updateFilesUponDeletion={updateFilesUponDeletion} updateFileUponSummary={updateFileUponSummary}></DisplayFiles>
+            <DisplayFiles allFiles={filteredFiles} pollingFileIds={pollingFileIds} updateFilesList={updateFilesList} updateFilesUponDeletion={updateFilesUponDeletion} updateFileUponSummary={updateFileUponSummary}></DisplayFiles>
           </div>
         </div>
       </SidebarInset>

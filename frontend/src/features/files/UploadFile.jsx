@@ -2,7 +2,7 @@ import { fileUpload, pollForCategory } from "./filesApi";
 import { toast } from "@/components/ui/toast"
 import { Upload } from "lucide-react";
 
-export function UploadFile({ uploadingStatus, appendFiles, updateFileUponCategory }) {
+export function UploadFile({ uploadingStatus, appendFiles, updateFileUponCategory, updatePollingFileId }) {
     const handleChange = async (e) => {
         uploadingStatus(true);
 
@@ -14,7 +14,7 @@ export function UploadFile({ uploadingStatus, appendFiles, updateFileUponCategor
                 type: "info",
                 description: `File was uploaded successfully.`,
             });
-            pollForCategory({ fileId: file.id, updateFileUponCategory });
+            pollForCategory({ fileId: file.id, updateFileUponCategory, updatePollingFileId });
         } catch(err) {
             toast.add({
                 type: "error",

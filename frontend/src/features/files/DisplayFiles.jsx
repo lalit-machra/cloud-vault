@@ -56,7 +56,7 @@ const categoryStyles = {
   Others: "",
 };
 
-export function DisplayFiles({ allFiles, updateFilesUponDeletion, updateFileUponSummary }) {
+export function DisplayFiles({ allFiles, pollingFileIds, updateFilesUponDeletion, updateFileUponSummary }) {
   const [ selected, setSelected ] = useState(null);
   const [ loadingFileId, setLoadingFileId ] = useState(null);
   const [ summaryFileId, setSummaryFileId ] = useState(null);
@@ -95,9 +95,7 @@ export function DisplayFiles({ allFiles, updateFilesUponDeletion, updateFileUpon
     try {
       const summary = await getSummary({ fileId });
       if (summary !== null) {
-        console.log("here in");
         updateFileUponSummary(fileId, summary);
-        console.log("here out");
       }
     } finally {
       setSummaryLoading(false);
@@ -151,8 +149,12 @@ export function DisplayFiles({ allFiles, updateFilesUponDeletion, updateFileUpon
                 <div className="flex flex-row justify-start items-center h-full gap-2">
                   <img src={getFileIcon(file.mime)} className="h-6 w-6 shrink-0" alt="" />
                   <span>{file.filename}</span>
-                  {file.category && 
-                    <Badge variant={file.category === "Others" ? "secondary" : "default"} className={categoryStyles[file.category]}>{file.category}</Badge>
+                  {file.category  
+                    ? (<Badge variant={file.category === "Others" ? "secondary" : "default"} className={categoryStyles[file.category]}>{file.category}</Badge>)
+                    : (pollingFileIds.has(file.id)
+                        ? <Badge variant="outline" className="text-muted-foreground animate-pulse">Categorizing...</Badge>
+                        : null
+                      )
                   }
                 </div>
               </TableCell>

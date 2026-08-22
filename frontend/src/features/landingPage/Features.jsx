@@ -13,7 +13,9 @@ export function Features({ featurePageNumber, featureTitle, featureDescription, 
                 </div>) :
                 (<div className="min-h-screen w-full flex flex-row justify-start items-center mb-50">
                     <div className="w-3/5">
-                        <div className="rounded-2xl border border-cyan-200 bg-cyan-100/30 shadow-lg shadow-black/5 p-2"><img src={featureImg} className="rounded-xl"></img></div>
+                        <div className="rounded-2xl border border-cyan-200 bg-cyan-100/30 shadow-lg shadow-black/5 p-2">
+                            <video src={featureImg} className="w-full h-full object-cover rounded-xl" autoPlay muted loop playsInline></video>
+                        </div>
                     </div>
                     <div className="w-2/5 flex flex-col justify-center items-center gap-6">
                         <p className="text-4xl text-cyan-500 max-w-[400px]">{featureTitle}</p>

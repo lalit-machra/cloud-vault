@@ -1,10 +1,10 @@
 # CloudVault
 
-> A lightweight personal cloud storage platform built with React, Node.js, Express, PostgreSQL, and AWS.
+> A lightweight personal cloud storage platform built with React, Node.js, Express, PostgreSQL, AWS and OpenAI.
 
 **[🚀 Live Demo](https://cloud-vault-livid.vercel.app/)**
 
-CloudVault is a personal cloud storage platform — a lightweight alternative to something like Google Drive. Users sign up, land on a dashboard, and upload files that are securely stored and tied to their account alone. From there they can browse, search, sort, preview, download, and delete their files through a single clean interface, accessible from any device.
+CloudVault is a personal cloud storage platform — a lightweight alternative to something like Google Drive. Users sign up, land on a dashboard, and upload files that are securely stored and tied to their account alone. From there they can browse, search, sort, preview, download, delete, get an AI-generated summary of supported files on demand, and see files automatically categorized shortly after upload — all through a single clean interface, accessible from any device.
 
 ## Features
 
@@ -14,11 +14,8 @@ CloudVault is a personal cloud storage platform — a lightweight alternative to
 - **File management** — upload, list, search by filename, sort by name/date, preview, download, and delete
 - **Clean Dashboard UI** — built with React, Tailwind CSS, and shadcn/ui components
 - **Landing page** — public marketing page introducing the product before login/signup
-
-## Upcoming Features
-
-- **AI-generated file summaries** — automatic summarization of uploaded documents
-- **AI-powered categorization** — automatic tagging/categorization of files based on content
+- **AI-powered summaries** — a short, AI-generated summary is available on demand for any supported document, generated on first request and cached afterward so repeat views don't re-trigger the AI call
+- **AI-powered categorization** — every file is automatically categorized (Personal, Work, Education, Finance, Media, or Other) shortly after upload, without blocking the upload response.
 
 ## Tech Stack
 
@@ -29,6 +26,7 @@ CloudVault is a personal cloud storage platform — a lightweight alternative to
 - Zod for request validation
 - AWS SDK v3 (`@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner`)
 - Multer for handling file uploads
+- OpenAI API (gpt-5.6-luna) via the Responses API, for file summarization and categorization
 
 **Frontend**
 - React (Vite)
